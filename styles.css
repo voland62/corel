@@ -2,3 +2,21 @@ h1 {
     color: hotpink;
     font-family: cursive;
   }
+
+.ui {
+  display: flex;
+  gap: 5px;
+}
+
+  label {
+    font-family: sans-serif;
+    font-weight: 600;
+    color:dodgerblue;
+    margin: 0;
+    padding: 0;
+  }
+
+  .smoother {
+    
+    width: 300px;
+  }

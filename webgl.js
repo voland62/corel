@@ -54,6 +54,9 @@ uniform float scale;
 uniform vec2 texSize;
 uniform vec2 tileSize;
 uniform vec2 offset;
+
+uniform float smooThreshold;
+
 varying highp vec2 texCoord;
 vec2 toLocal(vec2 coord) {
 	return ((coord * texSize) - offset)/tileSize;
@@ -65,7 +68,7 @@ vec3 bary(vec2 p){
 }
 
 vec2 smoother (vec2 a, vec2 b, float alen, float blen) {
-	float d = 0.02;
+	float d = smooThreshold;
 	return  a + smoothstep(0.5 - d, 0.5 + d, alen / (alen + blen)) * (b - a);
 }
 
@@ -203,55 +206,81 @@ var pattern2_16 = gl.getAttribLocation(pattern2_12,"vertex");
 gl.enableVertexAttribArray(pattern2_16);
 var pattern2_17 = gl.getAttribLocation(pattern2_12,"_texCoord");
 gl.enableVertexAttribArray(pattern2_17);
-gl.useProgram(pattern2_12);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
-gl.vertexAttribPointer(pattern2_16,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
-gl.vertexAttribPointer(pattern2_17,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
-gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-gl.activeTexture(gl.TEXTURE0);
-gl.bindTexture(gl.TEXTURE_2D,pattern2_5);
-gl.bindFramebuffer(gl.FRAMEBUFFER,pattern2_11);
-gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,pattern2_6,0);
-gl.viewport(0,0,860,860);
-gl.useProgram(pattern2_2);
-var pattern2_18 = gl.getUniformLocation(pattern2_2,"center");
-gl.uniform2fv(pattern2_18,new Float32Array([430,430]));
-var pattern2_19 = gl.getUniformLocation(pattern2_2,"scale");
-gl.uniform1f(pattern2_19,75.68);
-var pattern2_20 = gl.getUniformLocation(pattern2_2,"texSize");
-gl.uniform2fv(pattern2_20,new Float32Array([860,860]));
-var pattern2_21 = gl.getUniformLocation(pattern2_2,"tileSize");
-gl.uniform2fv(pattern2_21,new Float32Array([860,860]));
-var pattern2_22 = gl.getUniformLocation(pattern2_2,"offset");
-gl.uniform2fv(pattern2_22,new Float32Array([0,0]));
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
-gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,0,1,1,0,1,1]),gl.STATIC_DRAW);
-var pattern2_23 = gl.getAttribLocation(pattern2_2,"vertex");
-gl.enableVertexAttribArray(pattern2_23);
-var pattern2_24 = gl.getAttribLocation(pattern2_2,"_texCoord");
-gl.enableVertexAttribArray(pattern2_24);
-gl.useProgram(pattern2_2);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
-gl.vertexAttribPointer(pattern2_23,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
-gl.vertexAttribPointer(pattern2_24,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
-gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-gl.activeTexture(gl.TEXTURE0);
-gl.bindTexture(gl.TEXTURE_2D,pattern2_6);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
-gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,0,1,1,0,1,1]),gl.STATIC_DRAW);
-var pattern2_25 = gl.getAttribLocation(pattern2_9,"vertex");
-gl.enableVertexAttribArray(pattern2_25);
-var pattern2_26 = gl.getAttribLocation(pattern2_9,"_texCoord");
-gl.enableVertexAttribArray(pattern2_26);
-gl.useProgram(pattern2_9);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
-gl.vertexAttribPointer(pattern2_25,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
-gl.vertexAttribPointer(pattern2_26,gl.LINE_LOOP,gl.FLOAT,false,0,0);
-gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
-gl.deleteTexture(pattern2_4);
+
+
+
+function draw (smooth){
+	gl.useProgram(pattern2_12);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
+	gl.vertexAttribPointer(pattern2_16,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
+	gl.vertexAttribPointer(pattern2_17,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
+	gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D,pattern2_5);
+	gl.bindFramebuffer(gl.FRAMEBUFFER,pattern2_11);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,pattern2_6,0);
+	gl.viewport(0,0,860,860);
+
+	gl.useProgram(pattern2_2);
+	var pattern2_18 = gl.getUniformLocation(pattern2_2,"center");
+	gl.uniform2fv(pattern2_18,new Float32Array([430,430]));
+	var pattern2_19 = gl.getUniformLocation(pattern2_2,"scale");
+	gl.uniform1f(pattern2_19,75.68);
+
+	var pattern2_100 = gl.getUniformLocation(pattern2_2,"smooThreshold");
+	gl.uniform1f(pattern2_100, smooth);
+
+	var pattern2_20 = gl.getUniformLocation(pattern2_2,"texSize");
+	gl.uniform2fv(pattern2_20,new Float32Array([860,860]));
+	var pattern2_21 = gl.getUniformLocation(pattern2_2,"tileSize");
+	gl.uniform2fv(pattern2_21,new Float32Array([860,860]));
+	var pattern2_22 = gl.getUniformLocation(pattern2_2,"offset");
+	gl.uniform2fv(pattern2_22,new Float32Array([0,0]));
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
+	gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,0,1,1,0,1,1]),gl.STATIC_DRAW);
+	var pattern2_23 = gl.getAttribLocation(pattern2_2,"vertex");
+	gl.enableVertexAttribArray(pattern2_23);
+	var pattern2_24 = gl.getAttribLocation(pattern2_2,"_texCoord");
+	gl.enableVertexAttribArray(pattern2_24);
+
+
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
+	gl.vertexAttribPointer(pattern2_23,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
+	gl.vertexAttribPointer(pattern2_24,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
+	gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D,pattern2_6);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
+	gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,0,1,1,0,1,1]),gl.STATIC_DRAW);
+	var pattern2_25 = gl.getAttribLocation(pattern2_9,"vertex");
+	gl.enableVertexAttribArray(pattern2_25);
+	var pattern2_26 = gl.getAttribLocation(pattern2_9,"_texCoord");
+	gl.enableVertexAttribArray(pattern2_26);
+	gl.useProgram(pattern2_9);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_14);
+	gl.vertexAttribPointer(pattern2_25,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.bindBuffer(gl.ARRAY_BUFFER,pattern2_15);
+	gl.vertexAttribPointer(pattern2_26,gl.LINE_LOOP,gl.FLOAT,false,0,0);
+	gl.drawArrays(gl.TRIANGLE_STRIP,0,gl.TRIANGLES);
+	gl.deleteTexture(pattern2_4);
+}
+
+draw(0.05);
+
+const smoother = document.querySelector('.smoother');
+if (smoother) {
+	
+	smoother.addEventListener('input', (e) => {
+		//console.log(e.target.value);
+		//gl.uniform1f(pattern2_100, 0.1);
+		//////gl.uniform1f(pattern2_100, e.target.value);
+
+		draw(e.target.value);
+
+	});
+}
 
